@@ -19,11 +19,15 @@ class GraphqlRequester:
         self.request_headers = {
             "Authorization": f"Bearer {self.github_token}",
         }
-        query_constructor = QueryConstructor(self.username).queries
+        queries = QueryConstructor(self.username).queries
+        # self.request_body = {
+        #     "query": query_constructor["contributions"]["query"],
+        # }
+        # self.output_path = query_constructor["contributions"]["output_path"]
         self.request_body = {
-            "query": query_constructor["contributions"]["query"],
+            "query": queries["repositories"]["query"],
         }
-        self.output_path = query_constructor["contributions"]["output_path"]
+        self.output_path = queries["repositories"]["output_path"]
 
     def post(self):
         response = requests.post(
