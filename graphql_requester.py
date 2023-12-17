@@ -19,24 +19,27 @@ class GraphqlRequester:
         self.request_headers = {
             "Authorization": f"Bearer {self.github_token}",
         }
-        queries = QueryConstructor(self.username).queries
-        # self.request_body = {
-        #     "query": query_constructor["contributions"]["query"],
-        # }
-        # self.output_path = query_constructor["contributions"]["output_path"]
-        self.request_body = {
-            "query": queries["repositories"]["query"],
-        }
-        self.output_path = queries["repositories"]["output_path"]
+        self.queries = QueryConstructor(self.username).queries
 
     def post(self):
-        response = requests.post(
-            self.api_base, json=self.request_body, headers=self.request_headers
-        )
-        print(response.status_code)
-        data = response.json()
-        with open(self.output_path, mode="w", encoding="utf-8") as wf:
-            json.dump(data, wf, ensure_ascii=False, indent=4)
+        query_names = [
+            # "contributions",
+            # "repositories",
+            "contributions_by_type",
+        ]
+        for query_name in query_names:
+            print(query_name)
+            self.request_body = {
+                "query": self.queries[query_name]["query"],
+            }
+            self.output_path = self.queries[query_name]["output_path"]
+            response = requests.post(
+                self.api_base, json=self.request_body, headers=self.request_headers
+            )
+            print(response.status_code)
+            data = response.json()
+            with open(self.output_path, mode="w", encoding="utf-8") as wf:
+                json.dump(data, wf, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
