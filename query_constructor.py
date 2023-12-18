@@ -81,7 +81,7 @@ class QueryConstructor:
                 "query": f"""
                     query {{
                         user(login: "{self.username}") {{
-                            contributionsCollection(from: "2023-01-01T00:00:00Z", to: "2023-12-31T23:59:59Z") {{
+                            contributionsCollection(from: "2023-01-01T00:00:00+08:00", to: "2023-12-31T23:59:59+08:00") {{
                                 commitContributionsByRepository(maxRepositories: 100) {{
                                     repository {{
                                         nameWithOwner
@@ -91,6 +91,9 @@ class QueryConstructor:
                                             node {{
                                                 commitCount
                                                 occurredAt
+                                                resourcePath
+                                                url
+                                                isRestricted
                                             }}
                                         }}
                                     }}
@@ -134,39 +137,5 @@ class QueryConstructor:
                     }}
                 """,
                 "output_path": self.output_path_root / "contributions_by_type.json",
-            },
-            # Get `github_node_id` :
-            #   https://api.github.com/users/<username>
-            "commits_by_repository": {
-                "query": f"""
-                    query {{
-                        repository(owner:"{owner_name}", name:"{repo_name}") {{
-                            ref(qualifiedName: "main") {{
-                            target {{
-                                ... on Commit {{
-                                    history(first:100, author: {{id: "{self.github_node_id}"}}) {{
-                                        pageInfo {{
-                                            hasNextPage
-                                        }}
-                                        edges {{
-                                            node {{
-                                                messageHeadline
-                                                oid
-                                                message
-                                                author {{
-                                                    name
-                                                    email
-                                                    date
-                                                }}
-                                            }}
-                                        }}
-                                    }}
-                                }}
-                            }}
-                        }}
-                    }}
-                    }}
-                """,
-                "output_path": self.output_path_root / "commits_by_repository.json",
             },
         }
